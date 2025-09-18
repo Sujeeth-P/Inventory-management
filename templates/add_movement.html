@@ -4,18 +4,10 @@
 <div class="row justify-content-center">
     <div class="col-md-8">
         <h2>Add New Movement</h2>
-        
-        <div class="alert alert-info">
-            <strong>Movement Types:</strong>
-            <ul class="mb-0">
-                <li><strong>Stock In:</strong> Leave "From Location" empty, select "To Location"</li>
-                <li><strong>Stock Out:</strong> Select "From Location", leave "To Location" empty</li>
-                <li><strong>Transfer:</strong> Select both "From Location" and "To Location"</li>
-            </ul>
-        </div>
+    
         
         <form method="POST">
-            <div class="mb-3">
+            <div class="mb-3 mt-4">
                 <label for="movement_id" class="form-label">Movement ID *</label>
                 <input type="text" class="form-control" id="movement_id" name="movement_id" required>
                 <div class="form-text">Unique identifier for the movement (e.g., MOV001)</div>
