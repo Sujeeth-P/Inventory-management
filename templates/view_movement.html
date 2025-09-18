@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}View Movement - Inventory Management{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Movement Details</h2>
+            <div class="btn-group">
+                <a href="{{ url_for('edit_movement', movement_id=movement.movement_id) }}" class="btn btn-warning">Edit</a>
+                <a href="{{ url_for('movements') }}" class="btn btn-secondary">Back to Movements</a>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">Movement ID:</dt>
+                    <dd class="col-sm-9"><strong>{{ movement.movement_id }}</strong></dd>
+                    
+                    <dt class="col-sm-3">Timestamp:</dt>
+                   <dd class="col-sm-9">{{ movement.timestamp | datetime }}</dd>
+                    
+                    <dt class="col-sm-3">Product:</dt>
+                    <dd class="col-sm-9">
+                        <strong>{{ movement.product_id }}</strong>
+                        {% if movement.product_name %}
+                        <br><small class="text-muted">{{ movement.product_name }}</small>
+                        {% endif %}
+                    </dd>
+                    
+                    <dt class="col-sm-3">From Location:</dt>
+                    <dd class="col-sm-9">
+                        {% if movement.from_location %}
+                            <strong>{{ movement.from_location }}</strong>
+                            {% if movement.from_location_name %}
+                            <br><small class="text-muted">{{ movement.from_location_name }}</small>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">Not specified (Stock In)</span>
+                        {% endif %}
+                    </dd>
+                    
+                    <dt class="col-sm-3">To Location:</dt>
+                    <dd class="col-sm-9">
+                        {% if movement.to_location %}
+                            <strong>{{ movement.to_location }}</strong>
+                            {% if movement.to_location_name %}
+                            <br><small class="text-muted">{{ movement.to_location_name }}</small>
+                            {% endif %}
+                        {% else %}
+                            <span class="text-muted">Not specified (Stock Out)</span>
+                        {% endif %}
+                    </dd>
+                    
+                    <dt class="col-sm-3">Quantity:</dt>
+                    <dd class="col-sm-9"><span class="badge bg-primary fs-6">{{ movement.qty }}</span></dd>
+                    
+                    <dt class="col-sm-3">Movement Type:</dt>
+                    <dd class="col-sm-9">
+                        {% if movement.from_location and movement.to_location %}
+                            <span class="badge bg-info">Transfer</span>
+                        {% elif movement.from_location and not movement.to_location %}
+                            <span class="badge bg-danger">Stock Out</span>
+                        {% elif not movement.from_location and movement.to_location %}
+                            <span class="badge bg-success">Stock In</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Unknown</span>
+                        {% endif %}
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

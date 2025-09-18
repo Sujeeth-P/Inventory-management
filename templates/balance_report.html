@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Balance Report - Inventory Management{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Inventory Balance Report</h2>
+            <div class="btn-group">
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">Back to Dashboard</a>
+            </div>
+        </div>
+        
+        {% if balance_data %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Current Stock Levels by Location</h5>
+                <small class="text-muted">Generated on {{ moment().format('YYYY-MM-DD HH:mm:ss') if moment else 'Now' }}</small>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover balance-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Warehouse</th>
+                                <th>Qty</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for balance in balance_data %}
+                            <tr>
+                                <td>
+                                    <strong>{{ balance.product_id }}</strong><br>
+                                    <small class="text-muted">{{ balance.product_name }}</small>
+                                </td>
+                                <td>
+                                    <strong>{{ balance.location_id }}</strong><br>
+                                    <small class="text-muted">{{ balance.location_name }}</small>
+                                </td>
+                                <td>
+                                    {% if balance.total_qty > 0 %}
+                                        <span class="badge bg-success fs-6">{{ balance.total_qty }}</span>
+                                    {% elif balance.total_qty < 0 %}
+                                        <span class="badge bg-danger fs-6">{{ balance.total_qty }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary fs-6">0</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Summary Statistics -->
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Products</h5>
+                        <p class="card-text display-6">{{ balance_data | map(attribute='product_id') | unique | list | length }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Locations</h5>
+                        <p class="card-text display-6">{{ balance_data | map(attribute='location_id') | unique | list | length }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Stock Records</h5>
+                        <p class="card-text display-6">{{ balance_data | length }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% else %}
+        <div class="alert alert-info">
+            <h5>No balance data available</h5>
+            <p>There are no product movements recorded yet. Start by:</p>
+            <ul>
+                <li><a href="{{ url_for('add_movement') }}">Adding product movements</a></li>
+                <li><a href="{{ url_for('initialize_sample_data') }}">Initializing sample data</a></li>
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+@media print {
+    .btn-group, .navbar, .flash-messages {
+        display: none !important;
+    }
+    .balance-table th, .balance-table td {
+        border: 1px solid #000 !important;
+    }
+}
+</style>
+{% endblock %}

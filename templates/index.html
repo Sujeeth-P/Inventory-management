@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1>Inventory Management System</h1>
+        <div class="row mt-5">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Products</h5>
+                        <p><small>Manage product inventory</small></p>
+                        <a href="{{ url_for('products') }}" class="btn btn-primary mt-3">Manage Products</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Locations</h5>
+                        <p><small>Manage inventory locations</small></p>
+                        <a href="{{ url_for('locations') }}" class="btn btn-primary mt-3">Manage Locations</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Movements</h5>
+                        <p><small>Track inventory movements</small></p>
+                        <a href="{{ url_for('movements') }}" class="btn btn-primary mt-3">Manage Movements</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Balance Report</h5>
+                        <p><small>View current inventory balances</small></p>
+                        <a href="{{ url_for('balance_report') }}" class="btn btn-success mt-3">View Report</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="mt-4">
+            <h4>Quick Actions</h4>
+            <a href="{{ url_for('initialize_sample_data') }}" class="btn btn-warning">Initialize Sample Data</a>
+        </div> -->
+    </div>
+</div>
+{% endblock %}

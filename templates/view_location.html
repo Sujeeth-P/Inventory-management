@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}View Location - Inventory Management{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Location Details</h2>
+            <div class="btn-group">
+                <a href="{{ url_for('edit_location', location_id=location.location_id) }}" class="btn btn-warning">Edit</a>
+                <a href="{{ url_for('locations') }}" class="btn btn-secondary">Back to Locations</a>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">Location ID:</dt>
+                    <dd class="col-sm-9"><strong>{{ location.location_id }}</strong></dd>
+                    
+                    <dt class="col-sm-3">Name:</dt>
+                    <dd class="col-sm-9">{{ location.name }}</dd>
+                    
+                    <dt class="col-sm-3">Address:</dt>
+                    <dd class="col-sm-9">{{ location.address if location.address else 'No address provided' }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
