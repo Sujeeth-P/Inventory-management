@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, g
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 
 app = Flask(__name__)
@@ -73,9 +73,149 @@ with app.app_context():
 
 # ... rest of the code remains the same
 # Routes
+# @app.route('/')
+# def index():
+#     return render_template('index.html')
+
+# Replace your existing index() route in app.py with this:
+
 @app.route('/')
 def index():
-    return render_template('index.html')
+    db = get_db()   
+    
+    try:
+        # Get basic counts
+        total_products = db.execute('SELECT COUNT(*) as count FROM product').fetchone()['count']
+        total_locations = db.execute('SELECT COUNT(*) as count FROM location').fetchone()['count'] 
+        total_movements = db.execute('SELECT COUNT(*) as count FROM product_movement').fetchone()['count']
+        
+        # Calculate total stock (items in minus items out)
+        total_stock_in = db.execute('SELECT COALESCE(SUM(qty), 0) as total FROM product_movement WHERE to_location IS NOT NULL').fetchone()['total']
+        total_stock_out = db.execute('SELECT COALESCE(SUM(qty), 0) as total FROM product_movement WHERE from_location IS NOT NULL').fetchone()['total']
+        total_stock = total_stock_in - total_stock_out
+        
+        # Get stock by location
+        stock_by_location = []
+        locations = db.execute('SELECT location_id, name FROM location').fetchall()
+        
+        for location in locations:
+            stock_in = db.execute(
+                'SELECT COALESCE(SUM(qty), 0) as total FROM product_movement WHERE to_location = ?',
+                (location['location_id'],)
+            ).fetchone()['total']
+            
+            stock_out = db.execute(
+                'SELECT COALESCE(SUM(qty), 0) as total FROM product_movement WHERE from_location = ?',
+                (location['location_id'],)
+            ).fetchone()['total']
+            
+            net_stock = stock_in - stock_out
+            if net_stock > 0:
+                stock_by_location.append({
+                    'location': location['name'], 
+                    'stock': net_stock
+                })
+        
+        # Get product distribution
+        product_distribution = []
+        products = db.execute('SELECT product_id, name FROM product').fetchall()
+        
+        for product in products:
+            stock_in = db.execute(
+                'SELECT COALESCE(SUM(qty), 0) as total FROM product_movement WHERE product_id = ? AND to_location IS NOT NULL',
+                (product['product_id'],)
+            ).fetchone()['total']
+            
+            stock_out = db.execute(
+                'SELECT COALESCE(SUM(qty), 0) as total FROM product_movement WHERE product_id = ? AND from_location IS NOT NULL',
+                (product['product_id'],)
+            ).fetchone()['total']
+            
+            net_stock = stock_in - stock_out
+            if net_stock > 0:
+                product_distribution.append({
+                    'product': product['name'], 
+                    'stock': net_stock
+                })
+        
+        # Get movement types
+        movement_types = []
+        movement_type_query = db.execute('''
+            SELECT 
+                CASE 
+                    WHEN from_location IS NULL AND to_location IS NOT NULL THEN 'Stock In'
+                    WHEN from_location IS NOT NULL AND to_location IS NULL THEN 'Stock Out'
+                    WHEN from_location IS NOT NULL AND to_location IS NOT NULL THEN 'Transfer'
+                    ELSE 'Unknown'
+                END as movement_type,
+                COUNT(*) as count
+            FROM product_movement
+            GROUP BY movement_type
+        ''').fetchall()
+        
+        for row in movement_type_query:
+            movement_types.append({
+                'type': row['movement_type'], 
+                'count': row['count']
+            })
+        
+        # Get low stock products (less than 10 units)
+        low_stock = []
+        for product in products:
+            stock_in = db.execute(
+                'SELECT COALESCE(SUM(qty), 0) as total FROM product_movement WHERE product_id = ? AND to_location IS NOT NULL',
+                (product['product_id'],)
+            ).fetchone()['total']
+            
+            stock_out = db.execute(
+                'SELECT COALESCE(SUM(qty), 0) as total FROM product_movement WHERE product_id = ? AND from_location IS NOT NULL',
+                (product['product_id'],)
+            ).fetchone()['total']
+            
+            net_stock = stock_in - stock_out
+            if 0 < net_stock < 10:
+                low_stock.append({
+                    'id': product['product_id'],
+                    'name': product['name'],
+                    'stock': net_stock
+                })
+        
+        # Package all dashboard data
+        dashboard_data = {
+            'total_products': total_products,
+            'total_locations': total_locations,
+            'total_movements': total_movements,
+            'total_stock': max(0, total_stock),  # Don't show negative stock
+            'stock_by_location': stock_by_location,
+            'product_distribution': product_distribution,
+            'movement_types': movement_types,
+            'low_stock': low_stock
+        }
+        
+        return render_template('index.html',
+                             dashboard_data=dashboard_data,
+                             current_time=datetime.utcnow().strftime('%a, %I:%M %p'))
+    
+    except Exception as e:
+        print(f"Dashboard Error: {str(e)}")
+        # Return empty dashboard data if there's an error
+        dashboard_data = {
+            'total_products': 0,
+            'total_locations': 0,
+            'total_movements': 0,
+            'total_stock': 0,
+            'stock_by_location': [],
+            'product_distribution': [],
+            'movement_types': [],
+            'low_stock': []
+        }
+        
+        return render_template('index.html',
+                             dashboard_data=dashboard_data,
+                             current_time=datetime.utcnow().strftime('%a, %I:%M %p'),
+                             error_message=f"Dashboard error: {str(e)}")
+
+
 
 # Product Routes
 @app.route('/products')
@@ -357,6 +497,10 @@ def balance_report():
     
     balance_data = db.execute(query).fetchall()
     return render_template('balance_report.html', balance_data=balance_data)
+
+
+
+
 
 # Initialize sample data
 @app.route('/initialize_sample_data')

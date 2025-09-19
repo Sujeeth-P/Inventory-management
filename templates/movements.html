@@ -3,9 +3,9 @@
 {% block content %}
 <div class="row">
     <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-5">
             <h2>Product Movements</h2>
-            <a href="{{ url_for('add_movement') }}" class="btn btn-success">Add New Movement</a>
+            <a href="{{ url_for('add_movement') }}" class="btn btn-success m-3">Add New Movement</a>
         </div>
         
         {% if movements %}
@@ -67,4 +67,68 @@
         {% endif %}
     </div>
 </div>
+
+<style>
+    /* Add border around the whole table and cells */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table th, table td {
+  border: 1px solid #ddd;
+  background-color: #ffffff !important; /* light grey border */
+  padding: 12px;
+}
+
+/* Default row style */
+table tr {
+  /* background-color: #ffffff !important; */
+  transition: all 0.3s ease; /* smooth hover effect */
+  height: 60px;
+}
+
+/* Alternate row background if needed */
+table tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+/* Hover effect – slightly scale and elevate */
+table tr:hover {
+  background-color: #ffffff;
+  transform: scale(1.04);          /* expand a bit */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* small shadow for "coming front" */
+  z-index: 10; /* bring forward */
+  position: relative;
+}
+
+</style>
+<!-- <style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+  border: 1px solid #ddd;
+}
+
+table th, table td {
+  /* border: 1px solid #ddd; */
+  background-color: #ffffff;
+  padding: 12px;
+  transition: all 0.5s ease; /* animate on hover */
+}
+
+table tr{
+    height: 60px;
+}
+/* on hover of row, scale the cells */
+table tr:hover td {
+  background-color: #ffffff;
+  transform: scale(1.08);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  position: relative;
+  z-index: 5;
+}
+
+</style> -->
+
 {% endblock %}
