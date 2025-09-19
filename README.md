@@ -27,7 +27,7 @@ A web-based inventory management system built with Flask that helps track produc
 - **Balance Report**
   - View current stock levels across all locations
   - Filter and search functionality
-  ![Balance Report](screenshots/balancereport.png)
+  ![Balance Report](screenshots/balancereports.png)
 
 ## Technology Stack
 
@@ -82,7 +82,7 @@ The application uses SQLite with the following tables:
 ![View Locations](screenshots/addlocation.png)
 
 ### Edit Locations
-![View Locations](screenshots/editllocation.png)
+![View Locations](screenshots/editlocation.png)
 
 ### Add Movements
 ![View Movements](screenshots/addmovement.png)
