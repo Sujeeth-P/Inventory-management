@@ -71,14 +71,6 @@ def init_db():
 with app.app_context():
     init_db()
 
-# ... rest of the code remains the same
-# Routes
-# @app.route('/')
-# def index():
-#     return render_template('index.html')
-
-# Replace your existing index() route in app.py with this:
-
 @app.route('/')
 def index():
     db = get_db()   
@@ -498,88 +490,6 @@ def balance_report():
     balance_data = db.execute(query).fetchall()
     return render_template('balance_report.html', balance_data=balance_data)
 
-
-
-
-
-# Initialize sample data
-@app.route('/initialize_sample_data')
-def initialize_sample_data():
-    db = get_db()
-    
-    try:
-        # Clear existing data
-        db.execute('DELETE FROM product_movement')
-        db.execute('DELETE FROM product')
-        db.execute('DELETE FROM location')
-        
-        # Create sample products
-        products = [
-            ('PROD001', 'Laptop', 'Dell Inspiron 15'),
-            ('PROD002', 'Mouse', 'Wireless Optical Mouse'),
-            ('PROD003', 'Keyboard', 'Mechanical Keyboard'),
-            ('PROD004', 'Monitor', '24-inch LED Monitor')
-        ]
-        
-        for product in products:
-            db.execute('INSERT INTO product (product_id, name, description) VALUES (?, ?, ?)', product)
-        
-        # Create sample locations
-        locations = [
-            ('WH001', 'Main Warehouse', '123 Storage St, City'),
-            ('WH002', 'Secondary Warehouse', '456 Depot Ave, Town'),
-            ('STORE01', 'Retail Store', '789 Shopping Mall, Center'),
-            ('OFFICE01', 'Office Storage', '321 Business Blvd, District')
-        ]
-        
-        for location in locations:
-            db.execute('INSERT INTO location (location_id, name, address) VALUES (?, ?, ?)', location)
-        
-        # Create sample movements
-        movements = [
-            # Initial stock into warehouses
-            ('MOV001', None, 'WH001', 'PROD001', 50),
-            ('MOV002', None, 'WH001', 'PROD002', 100),
-            ('MOV003', None, 'WH002', 'PROD003', 75),
-            ('MOV004', None, 'WH002', 'PROD004', 30),
-            
-            # Move products between locations
-            ('MOV005', 'WH001', 'STORE01', 'PROD001', 10),
-            ('MOV006', 'WH001', 'OFFICE01', 'PROD002', 20),
-            ('MOV007', 'WH002', 'WH001', 'PROD003', 25),
-            ('MOV008', 'WH002', 'STORE01', 'PROD004', 5),
-            
-            # More movements for testing
-            ('MOV009', 'STORE01', 'OFFICE01', 'PROD001', 3),
-            ('MOV010', 'WH001', 'WH002', 'PROD002', 15),
-            ('MOV011', None, 'WH001', 'PROD001', 20),
-            ('MOV012', 'WH001', None, 'PROD001', 5),
-            ('MOV013', 'OFFICE01', 'STORE01', 'PROD002', 10),
-            ('MOV014', None, 'STORE01', 'PROD003', 40),
-            ('MOV015', 'STORE01', 'WH002', 'PROD003', 15),
-            
-            # Additional movements
-            ('MOV016', 'WH002', 'OFFICE01', 'PROD004', 8),
-            ('MOV017', None, 'WH001', 'PROD004', 25),
-            ('MOV018', 'WH001', 'STORE01', 'PROD004', 12),
-            ('MOV019', 'OFFICE01', 'WH001', 'PROD001', 2),
-            ('MOV020', 'WH001', None, 'PROD002', 30)
-        ]
-        
-        for movement in movements:
-            db.execute(
-                'INSERT INTO product_movement (movement_id, from_location, to_location, product_id, qty) VALUES (?, ?, ?, ?, ?)',
-                movement
-            )
-        
-        db.commit()
-        flash('Sample data initialized successfully!', 'success')
-    
-    except Exception as e:
-        db.rollback()
-        flash(f'Error initializing sample data: {str(e)}', 'error')
-    
-    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True)
